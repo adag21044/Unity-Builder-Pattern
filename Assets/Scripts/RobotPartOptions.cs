@@ -5,20 +5,25 @@ public class RobotPartOptions
 {
     public RobotPart PartType; // This is the type of part
     public GameObject[] Options; // These are the options for the part
-    private int currrentIndex;
+    private int currentIndex;
 
     public GameObject GetCurrentOption()
     {
-        return Options[currrentIndex];
+        return Options[currentIndex];
     }
 
     public void NextOption()
     {
-        currrentIndex = (currrentIndex + 1) % Options.Length;
+        currentIndex = (currentIndex + 1) % Options.Length;
     }
 
     public void PreviousOption()
     {
-        currrentIndex = (currrentIndex - 1 + Options.Length) % Options.Length;
+        currentIndex = (currentIndex - 1 + Options.Length) % Options.Length;
+    }
+
+    public void SetCurrentIndex(int index)
+    {
+        currentIndex = Mathf.Clamp(index, 0, Options.Length - 1);
     }
 }

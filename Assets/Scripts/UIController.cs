@@ -1,75 +1,96 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using TMPro;
 
 public class UIController : MonoBehaviour
 {
-    public RobotPartOptions[] PartOptions; // Tüm parçaların seçenekleri
+    public RobotPartOptions HeadOptions;
+    public RobotPartOptions BodyOptions;
+    public RobotPartOptions LeftArmOptions;
+    public RobotPartOptions RightArmOptions;
+    public RobotPartOptions LeftLegOptions;
+    public RobotPartOptions RightLegOptions;
 
-    // TextMesh Pro bileşenleri
-    public TMP_Text HeadText;
-    public TMP_Text BodyText;
-    public TMP_Text LeftArmText;
-    public TMP_Text RightArmText;
-    public TMP_Text LeftLegText;
-    public TMP_Text RightLegText;
-
+    public TMP_Text PartText; // Display the name of the current part
     public Button NextButton;
     public Button PreviousButton;
     public Button BuildButton;
 
     private RobotBuilder _robotBuilder;
     private RobotDirector _robotDirector;
+    private GameObject _currentPart; // Currently selected part
 
     private void Start()
     {
-        _robotBuilder = new RobotBuilder();
+        _robotBuilder = FindObjectOfType<RobotBuilder>();
         _robotDirector = new RobotDirector(_robotBuilder);
 
         NextButton.onClick.AddListener(OnNextButtonClicked);
         PreviousButton.onClick.AddListener(OnPreviousButtonClicked);
         BuildButton.onClick.AddListener(OnBuildButtonClicked);
 
-        UpdateUI(); // Başlangıçta UI'yi güncelle
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
+        if (_currentPart != null)
+        {
+            PartText.text = _currentPart.name;
+        }
     }
 
     private void OnNextButtonClicked()
     {
-        foreach (var option in PartOptions)
-        {
-            option.NextOption();
-        }
+        if (_currentPart == null) return;
+
+        RobotPartOptions options = GetOptionsForPart(_currentPart);
+        options.NextOption();
         UpdateUI();
     }
 
     private void OnPreviousButtonClicked()
     {
-        foreach (var option in PartOptions)
-        {
-            option.PreviousOption();
-        }
+        if (_currentPart == null) return;
+
+        RobotPartOptions options = GetOptionsForPart(_currentPart);
+        options.PreviousOption();
         UpdateUI();
     }
 
     private void OnBuildButtonClicked()
     {
-        _robotDirector.Construct(
-            PartOptions[0], // Head
-            PartOptions[1], // Body
-            PartOptions[2], // Left Arm
-            PartOptions[3], // Right Arm
-            PartOptions[4], // Left Leg
-            PartOptions[5]  // Right Leg
+        if (_currentPart == null) return;
+
+        GameObject robot = _robotDirector.Construct(
+            HeadOptions, 
+            BodyOptions, 
+            LeftArmOptions, 
+            RightArmOptions, 
+            LeftLegOptions, 
+            RightLegOptions
         );
+
+        // Do something with the built robot if needed
+        // For example, set it as active in the scene
+        robot.SetActive(true);
     }
 
-    private void UpdateUI()
+    private RobotPartOptions GetOptionsForPart(GameObject part)
     {
-        HeadText.text = PartOptions[0].GetCurrentOption().name;
-        BodyText.text = PartOptions[1].GetCurrentOption().name;
-        LeftArmText.text = PartOptions[2].GetCurrentOption().name;
-        RightArmText.text = PartOptions[3].GetCurrentOption().name;
-        LeftLegText.text = PartOptions[4].GetCurrentOption().name;
-        RightLegText.text = PartOptions[5].GetCurrentOption().name;
+        if (part.CompareTag("Head")) return HeadOptions;
+        if (part.CompareTag("Body")) return BodyOptions;
+        if (part.CompareTag("Left Arm")) return LeftArmOptions;
+        if (part.CompareTag("Right Arm")) return RightArmOptions;
+        if (part.CompareTag("Left Leg")) return LeftLegOptions;
+        if (part.CompareTag("Right Leg")) return RightLegOptions;
+
+        return null;
+    }
+
+    public void SetCurrentPart(GameObject part)
+    {
+        _currentPart = part;
+        UpdateUI();
     }
 }
