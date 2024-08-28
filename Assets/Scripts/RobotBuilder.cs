@@ -14,10 +14,15 @@ public class RobotBuilder : MonoBehaviour, IRobotBuilder
 
     private void Awake()
     {
-        // Create the robot and set its scale to half
+        // Create the robot GameObject
         _robot = new GameObject("Robot");
         _parentTransform = _robot.transform;
-        _parentTransform.localScale = Vector3.one * 0.5f; // Scale down to half
+
+        // Set the scale to half
+        _parentTransform.localScale = Vector3.one * 0.5f;
+
+        // Set the position to (7, -2, 0)
+        _parentTransform.position = new Vector3(7, -2, 0);
     }
 
     public IRobotBuilder SetHead(GameObject head)
